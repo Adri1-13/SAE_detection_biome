@@ -1,17 +1,10 @@
 package flou_image;
 
-/**
- * Construit un noyau (kernel) de convolution gaussien carré et normalisé.
- *
- * Le noyau est calculé à partir de la formule de Gauss 2D, centré sur sa case
- * du milieu (le pixel courant lors de la convolution), puis normalisé pour que
- * la somme de tous ses coefficients vaille 1 — ce qui préserve la luminosité
- * de l'image floutée.
- */
+
 public class FiltreGaussien {
 
     /** Écart-type utilisé par défaut si aucun n'est précisé. */
-    private static final double SIGMA_PAR_DEFAUT = 1.0;
+    private static final double SIGMA_PAR_DEFAUT = 2.0;
 
     private final double[][] coefficients;
 
