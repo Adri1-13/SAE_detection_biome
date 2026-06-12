@@ -11,6 +11,12 @@ import java.util.ArrayList;
 
 public class FlouMoyenne implements ProcessFlou {
 
+    private int longueurCarres;
+
+    public FlouMoyenne(int longueurCarres) {
+        this.longueurCarres = longueurCarres;
+    }
+
     @Override
     public void flouterImage(String src) {
         try {
