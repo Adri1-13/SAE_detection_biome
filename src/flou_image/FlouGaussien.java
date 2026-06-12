@@ -7,17 +7,17 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Applique un flou gaussien à une image par convolution avec un noyau gaussien.
+ * Applique un flou à une image avec un filtre gaussien.
  *
  * Pour chaque pixel, on fait la moyenne pondérée de ses voisins selon les
  * coefficients du noyau : le pixel central pèse le plus, et le poids décroît
- * avec l'éloignement. Les bords sont gérés par « clamp » (les coordonnées hors
+ * avec l'éloignement. Les bords sont gérés par « restriction » (les coordonnées hors
  * image sont ramenées sur le bord le plus proche).
  */
 public class FlouGaussien implements ProcessFlou {
 
     /** Taille de noyau utilisée par le constructeur sans argument. */
-    private static final int TAILLE_PAR_DEFAUT = 5;
+    private static final int TAILLE_PAR_DEFAUT = 9;
 
     private final int tailleFiltre;
 
@@ -61,9 +61,9 @@ public class FlouGaussien implements ProcessFlou {
 
                     // Parcours du voisinage couvert par le noyau.
                     for (int dy = -rayon; dy <= rayon; dy++) {
-                        int yVoisin = clamp(y + dy, 0, hauteur - 1);
+                        int yVoisin = restriction(y + dy, 0, hauteur - 1);
                         for (int dx = -rayon; dx <= rayon; dx++) {
-                            int xVoisin = clamp(x + dx, 0, largeur - 1);
+                            int xVoisin = restriction(x + dx, 0, largeur - 1);
 
                             Color couleurVoisin = new Color(imageSource.getRGB(xVoisin, yVoisin));
                             double poids = noyau[dy + rayon][dx + rayon];
@@ -74,9 +74,9 @@ public class FlouGaussien implements ProcessFlou {
                         }
                     }
 
-                    int rouge = clamp((int) Math.round(sommeRouge), 0, 255);
-                    int vert  = clamp((int) Math.round(sommeVert), 0, 255);
-                    int bleu  = clamp((int) Math.round(sommeBleu), 0, 255);
+                    int rouge = restriction((int) Math.round(sommeRouge), 0, 255);
+                    int vert  = restriction((int) Math.round(sommeVert), 0, 255);
+                    int bleu  = restriction((int) Math.round(sommeBleu), 0, 255);
 
                     imageFloutee.setRGB(x, y, new Color(rouge, vert, bleu).getRGB());
                 }
@@ -100,9 +100,8 @@ public class FlouGaussien implements ProcessFlou {
 
     /**
      * Restreint une valeur dans l'intervalle [min, max].
-     * Sert à la fois pour les coordonnées (gestion des bords) et les canaux couleur.
      */
-    private static int clamp(int valeur, int min, int max) {
+    private static int restriction(int valeur, int min, int max) {
         if (valeur < min) return min;
         if (valeur > max) return max;
         return valeur;
