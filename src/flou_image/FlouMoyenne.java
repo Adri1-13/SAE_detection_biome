@@ -29,7 +29,7 @@ public class FlouMoyenne implements ProcessFlou {
             String newName = f.getPath().split(".jpg")[0] + "_FlouMoyenne.png" ;
             BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
             int ecartDepuisCentre = this.longueurCarres/2;
-            for (int x = ecartDepuisCentre; x < bufferedImage.getWidth() - ecartDepuisCentre; x++) {
+            for (int x = ecartDepuisCentre; x < bufferedImage.getWidth() - ecartDepuisCentre; x++) { // boucle sur les pixels de l'image, on ne prend pas les pixels du bord car on ne peut pas faire un carré autour d'eux, donc on prend la zone centrale de l'image
                 for (int y = ecartDepuisCentre; y < bufferedImage.getHeight() - ecartDepuisCentre; y++) {
 
                     ArrayList<int[]> couleurs = new ArrayList<>();
@@ -53,7 +53,7 @@ public class FlouMoyenne implements ProcessFlou {
                     couleurFinale[1] /= couleurs.size();
                     couleurFinale[2] /= couleurs.size();
 
-                    newImage.setRGB(x, y, new Color(couleurFinale[0], couleurFinale[1], couleurFinale[2]).getRGB());
+                    newImage.setRGB(x, y, new Color(couleurFinale[0], couleurFinale[1], couleurFinale[2]).getRGB()); // seulement ici on met la couleur qui correspond à la moyenne des pixels du carré autour du pixel (x,y) dans la nouvelle image
                 }
             }
             File f2 = new File(newName);
