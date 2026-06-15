@@ -13,6 +13,10 @@ public class FlouMoyenne implements ProcessFlou {
 
     private int longueurCarres;
 
+    public FlouMoyenne() {
+        this.longueurCarres = 3;
+    }
+
     public FlouMoyenne(int longueurCarres) {
         this.longueurCarres = longueurCarres;
     }
@@ -24,15 +28,13 @@ public class FlouMoyenne implements ProcessFlou {
             BufferedImage bufferedImage = ImageIO.read(f);
             String newName = f.getPath().split(".jpg")[0] + "_FlouMoyenne.png" ;
             BufferedImage newImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            for (int x = 0; x < bufferedImage.getWidth()/3; x++) {
-                for (int y = 0; y < bufferedImage.getHeight()/3; y++) {
-
-                    //x;y --> division en carré de 3x3
+            int ecartDepuisCentre = this.longueurCarres/2;
+            for (int x = ecartDepuisCentre; x < bufferedImage.getWidth() - ecartDepuisCentre; x++) {
+                for (int y = ecartDepuisCentre; y < bufferedImage.getHeight() - ecartDepuisCentre; y++) {
 
                     ArrayList<int[]> couleurs = new ArrayList<>();
-                    // longueur et largeur divisés par 3 => pour récupérer des blocs de 3x3 pixels
-                    for (int i = 3 * x; i < 3 * x + 3; i++) {
-                        for (int j = 3 * y; j < 3 * y + 3; j++) {
+                    for (int i = x - ecartDepuisCentre; i <= x + ecartDepuisCentre; i++) {
+                        for (int j = y - ecartDepuisCentre; j <= y + ecartDepuisCentre; j++) {
                             //i;j --> un pixel de l'image
                             int[] rgb = OutilCouleur.getTabColor(bufferedImage.getRGB(i, j));
                             couleurs.add(rgb);
@@ -51,11 +53,7 @@ public class FlouMoyenne implements ProcessFlou {
                     couleurFinale[1] /= couleurs.size();
                     couleurFinale[2] /= couleurs.size();
 
-                    for (int i = 3 * x; i < 3 * x + 3; i++) { //parcours pour réécrire la couleur de chaque pixel du carré
-                        for (int j = 3 * y; j < 3 * y + 3; j++) {
-                            newImage.setRGB(i, j, new Color(couleurFinale[0], couleurFinale[1], couleurFinale[2]).getRGB());
-                        }
-                    }
+                    newImage.setRGB(x, y, new Color(couleurFinale[0], couleurFinale[1], couleurFinale[2]).getRGB());
                 }
             }
             File f2 = new File(newName);
