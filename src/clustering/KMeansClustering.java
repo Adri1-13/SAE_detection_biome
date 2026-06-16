@@ -6,102 +6,115 @@ public class KMeansClustering implements AlgoClustering {
 
     private int nbBarycentre;
     private int maxIterations;
-    private Random random;
+    private Random random = new Random();
 
     public KMeansClustering(int nb, int maxIterations) {
         this.nbBarycentre = nb;
         this.maxIterations = maxIterations;
-        this.random = new Random();
     }
 
     @Override
-    public int[] attribuerCluster(int[][] couleurs) {
-        if (couleurs == null || couleurs.length == 0) { //si pas de couleur dans le tableau
+    public int[] attribuerCluster(int[][] description) {
+        if (description == null || description.length == 0) {
             return new int[0];
         }
 
-        int n = couleurs.length;
-        int dimensions = 3; // --> R, G et B
-        int[] clusters = new int[n];
+        int tailleListe = description.length;
+        int dimensions = description[0].length; // mieux que 3 en dur (pour les couleurs) --> plus de cas d'usage
+        int[] clusters = new int[tailleListe];
 
-        // Centres initiaux : on prend nbBaryton couleurs au hasard
+        // Initialisation des centres
         double[][] centres = new double[nbBarycentre][dimensions];
-        for (int i = 0; i < nbBarycentre; i++) {
-            int index = random.nextInt(n); // index compris dans la taille du tableau de couleurs
+        initialiserCentres(description, centres);
 
-            // copie de la couleur d'une des couleurs de la liste dans un des centres (barycentre)
-            centres[i][0] = couleurs[index][0];
-            centres[i][1] = couleurs[index][1];
-            centres[i][2] = couleurs[index][2];
-        }
+        boolean changed = true;
+        int i = 0;
 
-        boolean changed = true; // flag pour tester si on arrive à un équilibre
-        int iteration = 0;
-
-        while (changed && iteration < maxIterations) {
+        while (changed && i < maxIterations) {
             changed = false;
 
-            // ##################################################
-            // Attribution des couleurs au cluster le plus proche
-            // ##################################################
-            for (int i = 0; i < n; i++) { //parcours du tableau des couleurs
-                int meilleurCluster = 0;
-                double meilleureDistance = distance(couleurs[i], centres[0]);
+            changed = agglomererValeursDansClusters(description, centres, clusters);
 
-                for (int c = 1; c < nbBarycentre; c++) { // c=1 car première comparaison effectuée pour initialiser la meilleureDistance
-                    double dist = distance(couleurs[i], centres[c]);
-                    if (dist < meilleureDistance) {
-                        meilleureDistance = dist;
-                        meilleurCluster = c;
-                    }
-                }
+            recalculerCentres(description, centres, clusters);
 
-                if (clusters[i] != meilleurCluster) { // changement depuis la dernière boucle ?
-                    clusters[i] = meilleurCluster;
-                    changed = true;
-                }
-            }
-
-            //#####################
-            // Recalcul des centres
-            //#####################
-            double[][] nouveauxCentres = new double[nbBarycentre][dimensions];
-            int[] counts = new int[nbBarycentre];
-
-            for (int i = 0; i < n; i++) { // parcours du tableau de couleur
-                int cluster = clusters[i];
-                counts[cluster]++; // incrémentation du compteur de cluster
-
-                //ajout de la valeur de la couleur au nouveau barycentre (première partie de la moyenne)
-                nouveauxCentres[cluster][0] += couleurs[i][0];
-                nouveauxCentres[cluster][1] += couleurs[i][1];
-                nouveauxCentres[cluster][2] += couleurs[i][2];
-            }
-
-            for (int i = 0; i < nbBarycentre; i++) {
-                if (counts[i] == 0) { // cluster vide : on le réinitialise avec une couleur aléatoire
-                    int index = random.nextInt(n);
-
-                    centres[i][0] = couleurs[index][0];
-                    centres[i][1] = couleurs[index][1];
-                    centres[i][2] = couleurs[index][2];
-
-                } else { // cluster non vide : on finalise la moyenne
-                    //division (deuxième partie de la moyenne)
-                    centres[i][0] = nouveauxCentres[i][0] / counts[i];
-                    centres[i][1] = nouveauxCentres[i][1] / counts[i];
-                    centres[i][2] = nouveauxCentres[i][2] / counts[i];
-
-                }
-            }
-
-            iteration++;
+            i++;
         }
 
         return clusters;
     }
 
-    private double distance(int[] couleurA, double[] couleurB) {
-        return Math.sqrt(Math.pow(couleurA[0] - couleurB[0], 2) + Math.pow(couleurA[1] - couleurB[1], 2) + Math.pow(couleurA[2] - couleurB[2], 2));
+
+    private boolean agglomererValeursDansClusters(int[][] description, double[][] centres, int[] clusters) {
+        boolean changed = false;
+
+        for (int i = 0; i < description.length; i++) { //parcours de la liste des valeurs (couleur des pixels ici)
+            int meilleurCluster = 0;
+            double meilleureDistance = distance(description[i], centres[0]);
+
+            for (int c = 1; c < centres.length; c++) { // c=1 --> première comparaison déjà effectuée à l'initialisation de la meilleure distance
+                double dist = distance(description[i], centres[c]);
+                if (dist < meilleureDistance) {
+                    meilleureDistance = dist;
+                    meilleurCluster = c;
+                }
+            }
+
+            if (clusters[i] != meilleurCluster) { //si aucun point ne change de cluster --> changed sera false
+                clusters[i] = meilleurCluster;
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+
+    private void recalculerCentres(int[][] description, double[][] centres, int[] clusters) {
+        int dimensions = description[0].length;
+        double[][] nouveauxCentres = new double[nbBarycentre][dimensions];
+        int[] counts = new int[nbBarycentre];
+
+        // Somme des coordonnées de chaque cluster
+        for (int i = 0; i < description.length; i++) { //parcours de tous les points
+            int cluster = clusters[i];
+            counts[cluster]++; // si le cluster n'a pas de points --> redéfini aléatoirement parmi les valeurs
+            for (int d = 0; d < dimensions; d++) { //parcours des valeurs de la liste (3 --> RGB)
+                nouveauxCentres[cluster][d] += description[i][d]; // ajout de toutes les valeurs (dans chaque dimension) --> preparation pour la moyenne (première étape : addition ; deuxième étape : division)
+            }
+        }
+
+        // Moyenne pour obtenir le nouveau centre
+        for (int c = 0; c < nbBarycentre; c++) {
+            if (counts[c] == 0) {
+                // Cluster vide : on réinitialise avec une couleur aléatoire
+                int index = random.nextInt(description.length);
+                for (int d = 0; d < dimensions; d++) {
+                    centres[c][d] = description[index][d];
+                }
+            } else {
+                for (int d = 0; d < dimensions; d++) {
+                    centres[c][d] = nouveauxCentres[c][d] / counts[c]; //partie deux de la moyenne --> division
+                }
+            }
+        }
+    }
+
+
+    private void initialiserCentres(int[][] description, double[][] centres) {
+        for (int i = 0; i < nbBarycentre; i++) {
+            int index = random.nextInt(description.length);
+            for (int d = 0; d < description[index].length; d++) {
+                centres[i][d] = description[index][d];
+            }
+        }
+    }
+
+    private double distance(int[] a, double[] b) {
+        double sum = 0;
+        for (int i = 0; i < a.length; i++) {
+            double diff = a[i] - b[i];
+            sum += diff * diff;
+        } // --> somme du carré de la différence entre chaque dimension --> (x1 - x2)² + (y1 - y2)² + (z1 + z2)² + ...
+        return Math.sqrt(sum);
     }
 }
