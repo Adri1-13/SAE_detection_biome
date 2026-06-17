@@ -1,2 +1,5 @@
 .idea/
 out/
+
+# Directory des résultats de biomes
+resultats/

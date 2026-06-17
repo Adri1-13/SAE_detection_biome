@@ -30,8 +30,7 @@ public class Etiquetage {
 
     // fonction qui calcule la distance entre deux couleurs en utilisant la distance euclidienne (à vérifier si c'est bien ce calcul de distance qu'il faut utiliser dans notre cas)
     // permet de comparer la couleur d'un pixel avec les couleurs de référence des biomes pour déterminer à quel biome appartient le pixel
-    public String etiqueter(int c) {
-        int[] couleurCluster = OutilCouleur.getTabColor(c);
+    public String etiqueter(int [] couleurCluster) {
 
         int meilleurIndex = 0;
         double meilleureDistance = distanceCouleur(couleurCluster, referencesCouleursBiomes[0]);
