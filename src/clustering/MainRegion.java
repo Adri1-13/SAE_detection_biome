@@ -1,5 +1,6 @@
 package clustering;
 
+import flou_image.FlouGaussien;
 import outils.AffichageBiomes;
 import outils.Etiquetage;
 import outils.OutilCouleur;
@@ -21,7 +22,8 @@ public class MainRegion {
             int hauteur = imageOriginale.getHeight();
 
             // clustering par couleur pour identifier les biomes
-            int[][] descriptionCouleurs = OutilCouleur.imageVersDescription(imageOriginale);
+            BufferedImage imageFloutee = new FlouGaussien(5).flouterBufferedImage(imageOriginale);
+            int[][] descriptionCouleurs = OutilCouleur.imageVersDescription(imageFloutee);
             AlgoClustering algoKMeans = new KMeansClustering(10, 100);
             int[] clustersBiomes = algoKMeans.attribuerCluster(descriptionCouleurs);
 

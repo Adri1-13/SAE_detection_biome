@@ -2,6 +2,7 @@ package outils;
 
 import clustering.AlgoClustering;
 import clustering.KMeansClustering;
+import flou_image.FlouGaussien;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,7 +19,8 @@ public class MainBiomes {
             int nbClusters = 10;
             int maxIterations = 100;
 
-            int[][] description = OutilCouleur.imageVersDescription(imageOriginale);
+            BufferedImage imageFloutee = new FlouGaussien(5).flouterBufferedImage(imageOriginale);
+            int[][] description = OutilCouleur.imageVersDescription(imageFloutee);
 
             AlgoClustering algo = new KMeansClustering(nbClusters, maxIterations);
             int[] clusters = algo.attribuerCluster(description);

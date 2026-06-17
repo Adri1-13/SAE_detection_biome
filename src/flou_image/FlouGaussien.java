@@ -98,6 +98,45 @@ public class FlouGaussien implements ProcessFlou {
         return racine + "_FlouGaussien.png";
     }
 
+    public BufferedImage flouterBufferedImage(BufferedImage imageSource) {
+        int largeur = imageSource.getWidth();
+        int hauteur = imageSource.getHeight();
+        BufferedImage imageFloutee = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_3BYTE_BGR);
+
+        double[][] noyau = new FiltreGaussien(tailleFiltre).getFiltre();
+        int rayon = tailleFiltre / 2;
+
+        for (int y = 0; y < hauteur; y++) {
+            for (int x = 0; x < largeur; x++) {
+                double sommeRouge = 0.0;
+                double sommeVert = 0.0;
+                double sommeBleu = 0.0;
+
+                for (int dy = -rayon; dy <= rayon; dy++) {
+                    int yVoisin = restriction(y + dy, 0, hauteur - 1);
+                    for (int dx = -rayon; dx <= rayon; dx++) {
+                        int xVoisin = restriction(x + dx, 0, largeur - 1);
+
+                        Color couleurVoisin = new Color(imageSource.getRGB(xVoisin, yVoisin));
+                        double poids = noyau[dy + rayon][dx + rayon];
+
+                        sommeRouge += couleurVoisin.getRed() * poids;
+                        sommeVert  += couleurVoisin.getGreen() * poids;
+                        sommeBleu  += couleurVoisin.getBlue() * poids;
+                    }
+                }
+
+                int rouge = restriction((int) Math.round(sommeRouge), 0, 255);
+                int vert  = restriction((int) Math.round(sommeVert), 0, 255);
+                int bleu  = restriction((int) Math.round(sommeBleu), 0, 255);
+
+                imageFloutee.setRGB(x, y, new Color(rouge, vert, bleu).getRGB());
+            }
+        }
+
+        return imageFloutee;
+    }
+
     /**
      * Restreint une valeur dans l'intervalle [min, max].
      */
