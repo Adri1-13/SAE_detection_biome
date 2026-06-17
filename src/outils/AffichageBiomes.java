@@ -1,5 +1,6 @@
 package outils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class AffichageBiomes {
@@ -18,15 +19,17 @@ public class AffichageBiomes {
             for (int x = 0; x < largeur; x++) {
                 int rgb = image.getRGB(x, y);
 
-                int r = (rgb >> 16) & 0xFF;
-                int g = (rgb >> 8) & 0xFF;
-                int b = rgb & 0xFF;
+                int[] tabColor = OutilCouleur.getTabColor(rgb);
+
+                int r = tabColor[0];
+                int g = tabColor[1];
+                int b = tabColor[2];
 
                 r = eclaircir(r, pourcentage);
                 g = eclaircir(g, pourcentage);
                 b = eclaircir(b, pourcentage);
 
-                int nouveauRGB = (r << 16) | (g << 8) | b;
+                int nouveauRGB = new Color(r, g, b).getRGB();
                 fond.setRGB(x, y, nouveauRGB);
             }
         }
