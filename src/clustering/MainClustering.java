@@ -1,5 +1,5 @@
-import clustering.AlgoClustering;
-import clustering.KMeansClustering;
+package clustering;
+
 import outils.OutilCouleur;
 
 import javax.imageio.ImageIO;
@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class Main {
+public class MainClustering {
     public static void main(String[] args) {
         try {
             File f = new File("images/Planete 1.jpg");
