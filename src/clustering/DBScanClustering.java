@@ -7,7 +7,7 @@ public class DBScanClustering implements AlgoClustering {
     // Algorithme de clustering DBSCAN --> fonctionne de ce que j'ai compris comme une propagation de clusters à partir core points (qui contiennent plus de points que  minPts dans leur rayon) et de leurs voisins, si les voisins sont eux-mêmes des core points, on continue la propagation, par contre, les points qui ne sont pas atteints par cette propagation sont considérés comme du bruit car ils sont trop extérieur donc trop distant dans l'esplace
 
 
-    /*
+    /**
     Fonctionnement de l'algorithme DBSCAN de ce que j'ai compris de l'algo du cours :
     1. Ici comme on est sur une image, que ce soit des couleurs de pixels donc 3 dimensions ou des postions de pixels donc 2, on parcourt tous les points de l'image en commençant par le le premier pixel
     Donc à partir de ce premier pixel on regarde tous ses voisins, ce qui veut donc dire qu'on regarde qui est proche de ce premierr pixel
@@ -20,8 +20,8 @@ public class DBScanClustering implements AlgoClustering {
 
     private int eps; // rayon de voisinage, correspond à la distance maximale entre deux points pour qu'ils soient considérés comme voisins
     private int minPts; // nombre minimum de points dans le voisinage pour qu'un point soit considéré comme un core point
-    private static final int NON_CLASSE = -2;
-    private static final int NOISE_POINT = -1;
+    public static final int NON_CLASSE = -2;
+    public static final int NOISE_POINT = -1;
 
     public DBScanClustering(int eps, int minPts) {
         this.eps = eps;

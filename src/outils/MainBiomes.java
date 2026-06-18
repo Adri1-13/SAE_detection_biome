@@ -1,6 +1,7 @@
 package outils;
 
 import clustering.AlgoClustering;
+import clustering.DBScanClustering;
 import clustering.KMeansClustering;
 import flou_image.FlouGaussien;
 
@@ -13,7 +14,8 @@ public class MainBiomes {
 
     public static void main(String[] args) {
         try {
-            File f = new File("images/Planete 3.jpg");
+            String chemin = args.length > 0 ? args[0] : "images/NouvelleImage.png";
+            File f = new File(chemin);
             BufferedImage imageOriginale = ImageIO.read(f);
 
             int nbClusters = 10;
@@ -23,6 +25,7 @@ public class MainBiomes {
             int[][] description = OutilCouleur.imageVersDescription(imageFloutee);
 
             AlgoClustering algo = new KMeansClustering(nbClusters, maxIterations);
+//            AlgoClustering algo = new DBScanClustering(15, 10);
             int[] clusters = algo.attribuerCluster(description);
 
             AffichageBiomes affichage = new AffichageBiomes();
@@ -57,7 +60,7 @@ public class MainBiomes {
                         75
                 );
 
-                String nomFichier = "resultats/biome_" + cluster + ".png";
+                String nomFichier = "resultats/biome_" + cluster + "_" + nomBiome + ".png";
                 ImageIO.write(imageBiome, "png", new File(nomFichier));
 
                 System.out.println("Cluster " + cluster + " -> " + nomBiome

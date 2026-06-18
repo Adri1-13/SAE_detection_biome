@@ -15,7 +15,8 @@ public class MainRegion {
 
     public static void main(String[] args) {
         try {
-            File f = new File("images/Planete 3.jpg");
+            String chemin = args.length > 0 ? args[0] : "images/NouvelleImage.png";
+            File f = new File(chemin);
             BufferedImage imageOriginale = ImageIO.read(f);
 
             int largeur = imageOriginale.getWidth();
